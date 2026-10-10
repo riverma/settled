@@ -1,0 +1,18 @@
+{
+  "name": "Settled",
+  "short_name": "Settled",
+  "description": "A pocket decision coach. Tell it what you're deciding, and it walks you through one proven method, so you can decide and move on.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fdeedb",
+  "theme_color": "#fdeedb",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    { "src": "./icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

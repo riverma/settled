@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en" class="ahimsa-day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Settled · interactive mockup</title>
+<link rel="stylesheet" href="_ahimsa/ahimsa.css">
+<style>
+/* ──────────────────────────────────────────────────────────
+   Settled mockup — built on the Ahimsa design system proper.
+   The dist stylesheet (_ahimsa/ahimsa.css, vendored with its
+   CHECKSUMS and fonts) supplies both aesthetics (theme class on
+   <html>), the token vocabulary, and every component class.
+   This block is mockup/app-shell only, plus one sanctioned
+   family override: Day's canvas takes the warm dawn the family
+   apps use (the very correction the dist's own notes cite).
+   Everything else references semantics, never palette steps.
+   ────────────────────────────────────────────────────────── */
+
+/* Family override — Day only. Night keeps the system's deep
+   blue-black canvas, its own real aesthetic. */
+html.ahimsa-day{
+  --surface-canvas: linear-gradient(160deg,#fbe5cd 0%,#fdeedb 45%,#fef6ea 100%);
+  --surface-canvas-flat:#fdeedb;
+  --surface-sunk:#f9e6d0;
+  --text-secondary:#3d3428c2;
+  --text-muted:#3d342899;
+  --text-faint:#3d342866;
+  --border-subtle:#3d34281f;
+  --border-medium:#3d342840;
+  --canvas-deeper:linear-gradient(160deg,#f9dcbb 0%,#fbe7cf 45%,#fdf1e0 100%);
+}
+html.ahimsa-night{ --canvas-deeper:var(--surface-canvas); }
+
+/* ── reset & page ── */
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ margin:0; padding:0; }
+body{ font-family:var(--font-body); color:var(--text-body); -webkit-font-smoothing:antialiased; background:var(--surface-canvas-flat); }
+button{ touch-action:manipulation; }
+textarea:focus,input:focus{ outline:none; }
+::-webkit-scrollbar{ display:none; }
+strong{ font-weight:600; }
+.mk-link{ color:var(--accent-primary); cursor:pointer; background:none; border:none; padding:0; font:inherit; }
+.ah-caption, .ah-quote, .caption-mixed{ color: var(--text-secondary); }
+.hidden{ display:none !important; }
+
+.scaffold{ display:flex; flex-direction:column; align-items:center; gap:22px; padding:36px 20px 56px; }
+.scaffold__caps{ color:var(--text-muted); font-size:9px; letter-spacing:.32em; text-transform:uppercase; text-align:center; font-weight:500; }
+.scaffold__note{ max-width:560px; color:var(--text-secondary); font-size:13.5px; line-height:1.55; text-align:center; }
+.scaffold__note code{ font-family:var(--font-mono); font-size:11.5px; }
+
+/* ── device frame (mockup chrome only) ── */
+.device{ width:396px; height:840px; border-radius:52px; background:var(--surface-inverse); padding:14px; box-shadow:var(--shadow-xl); position:relative; }
+.screen-shell{ width:100%; height:100%; border-radius:40px; overflow:hidden; background:var(--surface-canvas-flat); display:flex; flex-direction:column; position:relative; }
+.statusbar{ height:44px; flex:none; display:flex; align-items:center; justify-content:space-between; padding:0 26px; font-size:13px; font-weight:600; color:var(--text-body); position:relative; z-index:5; }
+.statusbar__island{ width:84px; height:26px; border-radius:14px; background:var(--surface-inverse); opacity:.9; }
+.statusbar__sym{ font-size:10px; letter-spacing:.08em; }
+.app{ position:relative; flex:1; min-height:0; overflow:hidden; }
+.screen{ position:absolute; inset:0; display:none; flex-direction:column; background:var(--surface-canvas); padding-top:4px; }
+.screen.is-active{ display:flex; }
+.screen.deeper{ background:var(--canvas-deeper); }
+.screen.surface-cream{ background:var(--gradient-cream); }
+.screen__scroll{ flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:none; padding:12px var(--gutter) 0; display:flex; flex-direction:column; gap:10px; }
+.screen__scroll::after{ content:''; display:block; flex:0 0 auto; height:120px; }
+.ah-hdr{ flex-shrink:0; }
+.home-indicator{ position:absolute; bottom:8px; left:50%; transform:translateX(-50%); width:130px; height:5px; border-radius:3px; background:var(--text-muted); opacity:.5; z-index:9; }
+.wordmark{ font-family:var(--font-display); font-size:19px; color:var(--text-heading); letter-spacing:.02em; }
+.hdr-spacer{ flex:1; }
+.back{ cursor:pointer; font-family:var(--font-body); font-size:15px; color:var(--text-secondary); min-height:44px; display:inline-flex; align-items:center; background:none; border:none; padding:0 8px 0 0; }
+.back small{ font-size:10px; letter-spacing:.22em; text-transform:uppercase; }
+
+/* ── footer actions (app shell) ── */
+.footer-actions{ position:absolute; left:0; right:0; bottom:0; padding:12px var(--gutter) 30px; z-index:8; display:flex; flex-direction:column; gap:8px;
+  background:var(--glass-overlay-strong); backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur)); border-top:1px solid var(--border-subtle); }
+.footer-actions .ah-actions > *{ flex:1; }
+.ah-actions--eq{ flex-wrap:nowrap; }
+
+/* ── home list ── */
+.dec-row{ width:100%; text-align:left; }
+.dec-row .q{ font-family:var(--font-display); font-size:16px; color:var(--text-heading); margin:0 0 8px; font-weight:400; }
+.dec-row .meta{ display:flex; align-items:center; gap:7px; margin-top:8px; }
+.dec-row .sentence{ font-family:var(--font-display); font-style:italic; font-size:14px; color:var(--text-secondary); margin:10px 0 0; border-top:1px solid var(--border-subtle); padding-top:10px; }
+.empty{ display:flex; flex-direction:column; align-items:flex-start; gap:10px; padding-top:18vh; }
+.empty .ah-pill{ font-size:11px; padding:10px 18px; margin-top:8px; }
+.list-grid{ display:flex; flex-direction:column; gap:10px; }
+
+/* ── stakes ── */
+.stake{ width:100%; text-align:left; border:none; border-radius:var(--radius-lg); background:var(--surface-elevated); color:var(--text-body);
+  box-shadow:var(--shadow-sm); padding:18px 20px; cursor:pointer; display:flex; flex-direction:column; gap:4px;
+  transition:background var(--duration-base) var(--ease-standard), color var(--duration-base) var(--ease-standard), box-shadow var(--duration-base); }
+.stake.is-selected{ background:var(--text-heading); color:var(--text-inverse); box-shadow:var(--shadow-md); }
+.stake .stake__w{ font-family:var(--font-display); font-style:italic; font-size:18px; color:var(--text-heading); }
+.stake.is-selected .stake__w{ color:var(--text-inverse); }
+.stake .stake__g{ font-size:12.5px; color:var(--text-muted); line-height:1.45; }
+.stake.is-selected .stake__g{ color:var(--text-inverse); opacity:.75; }
+
+/* ── step marker ── */
+.stepmark{ display:flex; align-items:center; gap:10px; margin:4px 0 14px; }
+.stepmark .ah-caps{ flex-shrink:0; }
+.stepmark__bar{ flex:1; height:3px; border-radius:2px; background:var(--border-subtle); overflow:hidden; }
+.stepmark__fill{ display:block; height:100%; background:var(--accent-primary); border-radius:2px; transition:width .3s var(--ease-standard); }
+
+/* ── options & criteria rows ── */
+.opt-row, .crit-row{ display:flex; gap:6px; align-items:flex-end; }
+.opt-row .ah-field, .crit-row .ah-field{ flex:1; }
+.opt-row button, .crit-row button{ min-height:44px; width:44px; flex:none; border:none; background:none; color:var(--text-muted); font-size:18px; cursor:pointer; border-radius:var(--radius-full); }
+.opt-row button:hover, .crit-row button:hover{ background:var(--surface-sunk); color:var(--text-body); }
+.addrow{ display:flex; gap:10px; margin-top:6px; }
+
+/* ── weigh-it-up grid (custom component; tokens only) ── */
+.grid-wrap{ overflow:auto; }
+table.mk-grid{ width:100%; border-collapse:collapse; }
+.mk-grid th{ font-family:var(--font-body); font-size:9px; font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--text-secondary);
+  text-align:left; padding:6px 6px 10px; }
+.mk-grid td{ padding:5px 6px; vertical-align:middle; }
+.mk-grid .g-opt{ font-family:var(--font-display); font-size:14px; color:var(--text-heading); padding-right:10px; white-space:nowrap; }
+.cell{ width:100%; min-height:44px; border-radius:var(--radius-md); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;
+  background:transparent; transition:background var(--duration-fast); }
+.cell:active{ background:var(--surface-sunk); }
+.cell i{ width:5px; height:5px; border-radius:99px; background:var(--border-strong); opacity:.5; transition:all var(--duration-fast); }
+.cell.is-1 i{ width:11px; opacity:.85; background:var(--accent-primary); }
+.cell.is-2 i{ width:11px; opacity:1; background:var(--text-heading); }
+
+/* ── rank ── */
+.rank{ display:flex; flex-direction:column; gap:10px; }
+.rank-item{ display:flex; align-items:center; gap:12px; border:none; border-radius:var(--radius-lg); background:var(--surface-elevated);
+  box-shadow:var(--shadow-sm); padding:14px 18px; }
+.rank-item .rank-item__t{ font-family:var(--font-display); font-size:14.5px; color:var(--text-heading); }
+
+/* ── yaml export ── */
+pre.yaml{ background:var(--surface-sunk); border-radius:var(--radius-md); padding:14px; font-family:var(--font-mono); font-size:11px; line-height:1.55; color:var(--text-body); max-height:300px; overflow:auto; white-space:pre-wrap; margin:0; }
+.yaml-caps{ color:var(--text-faint); font-size:9px; letter-spacing:.22em; text-transform:uppercase; margin:0 2px 8px; font-weight:500; }
+
+/* ── toast: sit above the footer bar ── */
+.ah-toast{ bottom:calc(var(--safe-bottom, 0px) + 96px); }
+.ah-toast:not(.is-visible){ opacity:0; }
+.ah-toast{ transition:opacity .2s var(--ease-standard); }
+
+/* ── sheet: the mock shows one sheet at a time inside the scrim ── */
+.ah-sheet{ display:none; }
+.ah-sheet.is-open{ display:block; }
+.ah-hit{ display:inline-flex; }
+/* the enlarged tap area must never block the control it extends */
+.ah-hit::after{ pointer-events:none; }
+/* interactive controls at the mandated 44px target */
+.ah-chip{ padding:13px 18px; }
+
+@media (prefers-reduced-motion: reduce){
+  .ah-sheet{ animation:none; }
+  .ah-toast > *{ animation:none; }
+}
+@media (max-width:520px){
+  .device{ width:100%; height:calc(100dvh - 16px); border-radius:0; padding:10px; box-shadow:none; }
+  .screen-shell{ border-radius:34px; }
+  .scaffold__caps,.scaffold__note{ display:none; }
+  .scaffold{ padding:8px; }
+}
+</style>
+</head>
+<body>
+<div class="scaffold">
+  <div class="scaffold__caps">Settled · interactive mockup · v0.1 (2026-10-08)</div>
+
+  <div class="device" id="device">
+    <div class="screen-shell" id="shell">
+
+      <div class="statusbar">
+        <span>9:41</span>
+        <span class="statusbar__island"></span>
+        <span class="statusbar__sym">5G · 92%</span>
+      </div>
+
+      <div class="app">
+
+        <!-- ══════════ HOME ══════════ -->
+        <section class="screen is-active" id="sc-home">
+          <div class="ah-hdr">
+            <span class="wordmark">Settled</span>
+            <span class="hdr-spacer"></span>
+            <span class="ah-hit"><button class="ah-pill" onclick="nav('sc-settings')">Settings</button></span>
+          </div>
+          <div class="screen__scroll">
+            <p class="ah-caption" id="home-lead" style="margin:2px 0 6px;color:var(--text-secondary);">What's on your mind?</p>
+            <div class="list-grid" id="home-list"></div>
+            <div class="empty" id="home-empty" style="display:none;">
+              <p class="ah-heading-l" style="font-size:32px;">What's on your mind?</p>
+              <p class="ah-body" style="color:var(--text-secondary);">A decision, any size. You write it, Settled picks the lightest proven method to go with it.</p>
+              <button class="ah-pill ah-pill--outline" onclick="newDecisionWith('Should I take the new job?')" style="padding:10px 18px;font-size:11px;margin-top:8px;">Take the new job?</button>
+            </div>
+          </div>
+          <div class="footer-actions">
+            <button class="ah-btn ah-btn--wide" onclick="openNew()">New decision</button>
+          </div>
+        </section>
+
+        <!-- ══════════ NEW DECISION ══════════ -->
+        <section class="screen" id="sc-new">
+          <div class="ah-hdr">
+            <button class="back" onclick="backHome()"><small>← Home</small></button>
+          </div>
+          <div class="screen__scroll">
+            <p class="ah-display-m" style="margin:8px 0 0;font-size:32px;">What do you need to decide?</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">Sent as you write it. Nothing here is rewritten.</p>
+            <div class="ah-field ah-field--essence" style="margin-top:8px;">
+              <input type="text" id="f-question" placeholder="Should I take the new job?" autocomplete="off">
+            </div>
+            <div style="margin-top:22px;">
+              <p class="ah-caps" style="margin-bottom:14px;">Options, if you have them</p>
+              <div id="opt-list"></div>
+              <div class="addrow">
+                <button class="ah-btn ah-btn--ghost ah-btn--sm" onclick="addOption()">Add an option</button>
+                <button class="ah-btn ah-btn--glass ah-btn--sm" id="btn-nothink" onclick="toggleNoOptions()">No options yet</button>
+              </div>
+              <p class="ah-caption hidden" id="noopt-note" style="color:var(--text-secondary);margin-top:10px;">Understood. The comparison will be against leaving it as it is.</p>
+            </div>
+          </div>
+          <div class="footer-actions">
+            <button class="ah-btn ah-btn--wide" onclick="toStakes()">Continue</button>
+          </div>
+        </section>
+
+        <!-- ══════════ STAKES ══════════ -->
+        <section class="screen" id="sc-stakes">
+          <div class="ah-hdr">
+            <button class="back" onclick="backHome()"><small>← Stop</small></button>
+          </div>
+          <div class="screen__scroll">
+            <p class="ah-heading-l">How much does this one matter?</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">One question. It decides which method is lightest and still honest.</p>
+            <div class="ah-stack" style="margin-top:10px;gap:10px;">
+              <button class="stake" data-stakes="a-little" onclick="setStakes(this)">
+                <span class="stake__w">A little</span>
+                <span class="stake__g">You would be fine either way.</span>
+              </button>
+              <button class="stake" data-stakes="somewhat" onclick="setStakes(this)">
+                <span class="stake__w">Somewhat</span>
+                <span class="stake__g">It matters, but a month from now you will have moved on.</span>
+              </button>
+              <button class="stake" data-stakes="a-lot" onclick="setStakes(this)">
+                <span class="stake__w">A lot</span>
+                <span class="stake__g">This one could change your life.</span>
+              </button>
+            </div>
+          </div>
+          <div class="footer-actions">
+            <button class="ah-btn ah-btn--wide is-disabled" id="btn-stakes-go" onclick="toMethod()">Continue</button>
+          </div>
+        </section>
+
+        <!-- ══════════ GOOD ENOUGH · bar ══════════ -->
+        <section class="screen" id="sc-ge-bar">
+          <div class="ah-hdr"><button class="back" onclick="backHome()"><small>← Stop</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps" id="ge-bar-n">Step 1 of 2</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:50%"></span></span></div>
+            <p class="ah-heading-l">What would good enough look like?</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">Not the perfect result. A result you would be glad to accept.</p>
+            <div class="ah-field ah-field--essence" style="margin-top:8px;"><textarea id="ge-bar-val" placeholder="Close, cheap, open now" style="min-height:70px;"></textarea></div>
+            <p class="ah-caption" style="color:var(--text-secondary);">Why this works: <button class="mk-link" onclick="openInfo('good-enough')">satisficing</button>.</p>
+          </div>
+          <div class="footer-actions">
+            <div class="ah-actions ah-actions--eq"><button class="ah-btn ah-btn--ghost" onclick="openWays()">A different way</button><button class="ah-btn" onclick="geToCheck()">Continue</button></div>
+            <button class="ah-btn ah-btn--glass ah-btn--sm" onclick="stopNow()">Stop for now</button>
+          </div>
+        </section>
+
+        <!-- ══════════ GOOD ENOUGH · check ══════════ -->
+        <section class="screen" id="sc-ge-check">
+          <div class="ah-hdr"><button class="back" onclick="goBack()"><small>← Back</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps" id="ge-check-n">Step 2 of 2</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:100%"></span></span></div>
+            <p class="ah-heading-l">Does it clear the bar?</p>
+            <p class="ah-caption" id="ge-check-q" style="color:var(--text-secondary);">Checking options, in order. The first yes is yours.</p>
+            <div class="ah-card ah-card--list" id="ge-check-cur"></div>
+            <div class="ah-actions ah-actions--eq">
+              <button class="ah-btn ah-btn--ghost" onclick="geMark('no')">No</button>
+              <button class="ah-btn" onclick="geMark('yes')">Yes</button>
+            </div>
+            <button class="ah-pill ah-pill--outline" style="align-self:flex-start;margin-top:6px;" onclick="geMark('notsure')">Not sure yet · keep it aside</button>
+          </div>
+        </section>
+
+        <!-- ══════════ GOOD ENOUGH · result ══════════ -->
+        <section class="screen" id="sc-ge-result">
+          <div class="ah-hdr"><button class="back" onclick="goBack()"><small>← Back</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps">Settled</span></div>
+            <p class="ah-heading-l" id="ge-result-title">Then take it.</p>
+            <p class="ah-quote ah-quote--md" id="ge-result-sub" style="text-align:left;color:var(--text-secondary);">It clears the bar.</p>
+          </div>
+          <div class="footer-actions">
+            <button class="ah-btn ah-btn--wide" onclick="toReal()">Continue</button>
+          </div>
+        </section>
+
+        <!-- ══════════ WEIGH IT UP · criteria ══════════ -->
+        <section class="screen surface-cream" id="sc-wp-crit">
+          <div class="ah-hdr"><button class="back" onclick="backHome()"><small>← Stop</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps" id="wp-crit-n">Step 1 of 4</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:25%"></span></span></div>
+            <p class="ah-heading-l">What matters here?</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">Two to five things, in your own words.</p>
+            <div id="crit-list" style="margin-top:6px;"></div>
+            <div><button class="ah-btn ah-btn--ghost ah-btn--sm" onclick="addCrit()">Add one</button></div>
+            <div class="ah-notice" id="wp-widen">
+              <span class="ah-notice__title">One more option?</span>
+              <span>Sometimes the third shape is the one that fits. Curiosity, not homework.</span>
+              <span class="ah-actions"><button class="ah-btn ah-btn--ghost ah-btn--sm" onclick="addOption()">Add an option</button></span>
+            </div>
+            <p class="ah-caption" style="color:var(--text-secondary);">Why this works: <button class="mk-link" onclick="openInfo('weigh-it-up')">a decision matrix</button>.</p>
+          </div>
+          <div class="footer-actions">
+            <div class="ah-actions ah-actions--eq"><button class="ah-btn ah-btn--ghost" onclick="openWays()">A different way</button><button class="ah-btn" onclick="wpToWeights()">Continue</button></div>
+            <button class="ah-btn ah-btn--glass ah-btn--sm" onclick="stopNow()">Stop for now</button>
+          </div>
+        </section>
+
+        <!-- ══════════ WEIGH IT UP · weights ══════════ -->
+        <section class="screen surface-cream" id="sc-wp-weight">
+          <div class="ah-hdr"><button class="back" onclick="goBack()"><small>← Back</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps" id="wp-weight-n">Step 2 of 4</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:50%"></span></span></div>
+            <p class="ah-heading-l">How much does each one matter?</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">Words, not numbers. The arithmetic stays underneath.</p>
+            <div id="weight-list"></div>
+          </div>
+          <div class="footer-actions">
+            <button class="ah-btn ah-btn--wide" onclick="wpToScores()">Continue</button>
+          </div>
+        </section>
+
+        <!-- ══════════ WEIGH IT UP · scores ══════════ -->
+        <section class="screen surface-cream" id="sc-wp-score">
+          <div class="ah-hdr"><button class="back" onclick="goBack()"><small>← Back</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps" id="wp-score-n">Step 3 of 4</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:75%"></span></span></div>
+            <p class="ah-heading-l">How well does each option fit?</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">Tap a cell to cycle: well · partly · poorly.</p>
+            <div class="ah-card ah-card--flat ah-card--p0" style="overflow:auto;">
+              <div class="grid-wrap" style="padding:18px;" id="score-grid"></div>
+            </div>
+          </div>
+          <div class="footer-actions">
+            <button class="ah-btn ah-btn--wide" onclick="wpToRank()">See how they line up</button>
+          </div>
+        </section>
+
+        <!-- ══════════ WEIGH IT UP · ordering ══════════ -->
+        <section class="screen surface-cream" id="sc-wp-rank">
+          <div class="ah-hdr"><button class="back" onclick="goBack()"><small>← Back</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps" id="wp-rank-n">Step 4 of 4</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:100%"></span></span></div>
+            <p class="ah-heading-l">Here is how they line up</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">A quiet ordering, not a scoreboard. The arithmetic is not the verdict.</p>
+            <div class="rank" id="rank-list" style="margin-top:8px;"></div>
+            <div class="ah-card">
+              <p class="ah-body" style="font-weight:600;color:var(--text-heading);">Does the top of the list change how you feel about it?</p>
+              <p class="ah-caption" style="color:var(--text-secondary);margin:2px 0 12px;">You can overrule it in the sentence either way.</p>
+              <div class="ah-actions ah-actions--eq"><button class="ah-btn" onclick="toReal()">It fits</button><button class="ah-btn ah-btn--ghost" onclick="toReal()">It doesn't</button></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════ LOOK AHEAD · 10 minutes ══════════ -->
+        <section class="screen deeper" id="sc-la-a">
+          <div class="ah-hdr"><button class="back" onclick="backHome()"><small>← Stop</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps" id="la-n">Step 1 of 5</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:20%"></span></span></div>
+            <p class="ah-heading-l">In ten minutes</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">How will you feel about each side, ten minutes after you choose?</p>
+            <div class="ah-field ah-field--essence" style="margin-top:8px;"><textarea id="la-a-val" placeholder="Probably relieved. A bit scared."></textarea></div>
+            <p class="ah-caption" style="color:var(--text-secondary);">Nothing here is required. Say as much or as little as there is.</p>
+          </div>
+          <div class="footer-actions">
+            <div class="ah-actions ah-actions--eq"><button class="ah-btn ah-btn--ghost" onclick="openWays()">A different way</button><button class="ah-btn" onclick="laNext()">Continue</button></div>
+            <button class="ah-btn ah-btn--glass ah-btn--sm" onclick="stopNow()">Stop for now</button>
+          </div>
+        </section>
+
+        <!-- ══════════ LOOK AHEAD · 10 months ══════════ -->
+        <section class="screen deeper" id="sc-la-b">
+          <div class="ah-hdr"><button class="back" onclick="goBack()"><small>← Back</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps" id="la-n2">Step 2 of 5</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:40%"></span></span></div>
+            <p class="ah-heading-l">In ten months</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">The same question, further out.</p>
+            <div class="ah-field ah-field--essence" style="margin-top:8px;"><textarea id="la-b-val" placeholder="Probably glad I moved."></textarea></div>
+          </div>
+          <div class="footer-actions"><button class="ah-btn ah-btn--wide" onclick="laNext()">Continue</button></div>
+        </section>
+
+        <!-- ══════════ LOOK AHEAD · 10 years ══════════ -->
+        <section class="screen deeper" id="sc-la-c">
+          <div class="ah-hdr"><button class="back" onclick="goBack()"><small>← Back</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps" id="la-n3">Step 3 of 5</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:60%"></span></span></div>
+            <p class="ah-heading-l">In ten years</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">This one usually dissolves the noise.</p>
+            <div class="ah-field ah-field--essence" style="margin-top:8px;"><textarea id="la-c-val" placeholder="I won't remember the fear."></textarea></div>
+          </div>
+          <div class="footer-actions"><button class="ah-btn ah-btn--wide" onclick="laNext()">Continue</button></div>
+        </section>
+
+        <!-- ══════════ LOOK AHEAD · regret check ══════════ -->
+        <section class="screen deeper" id="sc-la-reg">
+          <div class="ah-hdr"><button class="back" onclick="goBack()"><small>← Back</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps" id="la-n4">Step 4 of 5</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:80%"></span></span></div>
+            <p class="ah-heading-l">The regret check</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">Picture it a year from now, and it went wrong. What is the most likely reason?</p>
+            <div class="ah-field" style="margin-top:8px;"><span class="ah-field__label">Most likely cause</span><textarea id="la-reg-cause" placeholder="The team turns out to be toxic."></textarea></div>
+            <div class="ah-field" style="margin-top:14px;"><span class="ah-field__label">Can you guard against it before you decide?</span><textarea id="la-reg-guard" placeholder="Ask to meet the team first."></textarea></div>
+            <p class="ah-caption" style="color:var(--text-secondary);">Why this works: a <button class="mk-link" onclick="openInfo('look-ahead')">pre-mortem</button>.</p>
+          </div>
+          <div class="footer-actions"><button class="ah-btn ah-btn--wide" onclick="laNext()">Continue</button></div>
+        </section>
+
+        <!-- ══════════ LOOK AHEAD · the read ══════════ -->
+        <section class="screen deeper" id="sc-la-read">
+          <div class="ah-hdr"><button class="back" onclick="goBack()"><small>← Back</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps" id="la-n5">Step 5 of 5</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:100%"></span></span></div>
+            <p class="ah-heading-l">What the horizons said</p>
+            <p class="ah-caption" id="la-read-sum" style="color:var(--text-secondary);">Your three horizons, side by side. The gaps are usually the message.</p>
+            <div class="rank" id="la-read-list" style="margin-top:8px;"></div>
+            <div class="ah-notice">
+              <span class="ah-notice__title">The fear has a name now</span>
+              <span>Whatever you wrote, naming it is usually enough to loosen the stuck feeling.</span>
+            </div>
+          </div>
+          <div class="footer-actions"><button class="ah-btn ah-btn--wide" onclick="toReal()">Continue</button></div>
+        </section>
+
+        <!-- ══════════ MAKE IT REAL ══════════ -->
+        <section class="screen" id="sc-real">
+          <div class="ah-hdr"><button class="back" onclick="goBack()"><small>← Back</small></button></div>
+          <div class="screen__scroll">
+            <div class="stepmark"><span class="ah-caps">The close · every decision ends here</span></div>
+            <p class="ah-heading-l">Make it real</p>
+            <div class="ah-field ah-field--essence" style="margin-top:8px;"><span class="ah-field__label">The decision, in one sentence</span><input type="text" id="r-sentence" placeholder="I am taking the job." autocomplete="off"></div>
+            <div class="ah-field" style="margin-top:16px;"><span class="ah-field__label">The first step (optional)</span><input type="text" id="r-step" placeholder="Reply to the offer email." autocomplete="off"></div>
+            <div class="ah-field" style="margin-top:16px;"><span class="ah-field__label">When (optional)</span><input type="text" id="r-when" placeholder="Monday morning" autocomplete="off"></div>
+            <p class="ah-caption" style="color:var(--text-secondary);">There are no reminders here. This is for you, not for us.</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">Why this works: <button class="mk-link" onclick="openInfo('make-it-real')">an implementation intention</button>.</p>
+          </div>
+          <div class="footer-actions">
+            <button class="ah-btn ah-btn--wide" id="btn-real-go" onclick="saveDecision()">Save the decision</button>
+          </div>
+        </section>
+
+        <!-- ══════════ DECISION VIEW ══════════ -->
+        <section class="screen" id="sc-view">
+          <div class="ah-hdr">
+            <button class="back" onclick="nav('sc-home')"><small>← Home</small></button>
+          </div>
+          <div class="screen__scroll" id="view-body"></div>
+          <div class="footer-actions hidden" id="view-actions">
+            <div class="ah-actions ah-actions--eq">
+              <button class="ah-btn ah-btn--ghost" onclick="openExport()">Export</button>
+              <button class="ah-btn ah-btn--danger" onclick="openDelete()">Delete</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════ SETTINGS ══════════ -->
+        <section class="screen" id="sc-settings">
+          <div class="ah-hdr"><button class="back" onclick="nav('sc-home')"><small>← Home</small></button><span class="hdr-spacer"></span><span class="wordmark" style="font-size:16px;">Settings</span></div>
+          <div class="screen__scroll">
+            <div class="ah-card ah-card--list">
+              <p class="ah-caps" style="margin-bottom:12px;">Appearance</p>
+              <div class="ah-actions ah-actions--eq">
+                <span class="ah-hit" style="flex:1;"><button class="ah-chip" id="th-day" onclick="setTheme('day')">Day</button></span>
+                <span class="ah-hit" style="flex:1;"><button class="ah-chip" id="th-night" onclick="setTheme('night')">Night</button></span>
+              </div>
+            </div>
+            <div class="ah-card ah-card--list">
+              <p class="ah-caps" style="margin-bottom:12px;">Data</p>
+              <div class="ah-actions">
+                <button class="ah-btn ah-btn--ghost ah-btn--sm" onclick="toast('Exported one file. Everything, in plain YAML.')">Back up now</button>
+                <button class="ah-btn ah-btn--ghost ah-btn--sm" onclick="toast('Nothing to restore in the mockup.')">Restore from file</button>
+              </div>
+            </div>
+            <div class="ah-card ah-card--list is-tappable" onclick="openSheet('sheet-about')">
+              <p class="ah-caps" style="margin-bottom:6px;">About</p>
+              <p class="ah-body" style="color:var(--text-secondary);">Settled v0.1 · AGPL-3.0 · offline · no accounts · no analytics</p>
+            </div>
+            <div class="ah-card ah-card--list is-tappable" onclick="openSheet('sheet-erase1')">
+              <p class="ah-caps" style="color:var(--accent-warning);margin-bottom:6px;">Start over</p>
+              <p class="ah-body" style="color:var(--text-secondary);">Erase all data</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══════════ sheets ══════════ -->
+        <div class="ah-scrim hidden" id="bd" onclick="closeSheets()">
+          <div class="ah-sheet" id="sheet-ways" onclick="event.stopPropagation();">
+            <div class="ah-sheet__grab"></div>
+            <div class="ah-sheet__head"><h3 class="ah-sheet__title">A different way</h3><button class="ah-sheet__close" onclick="closeSheets()">×</button></div>
+            <p class="ah-caption" id="ways-sub" style="color:var(--text-secondary);margin-bottom:12px;">Each method is one proven tool. Nothing you wrote is lost.</p>
+            <div class="ah-list" id="ways-list"></div>
+            <div class="ah-actions" style="margin-top:14px;"><button class="ah-btn ah-btn--ghost" onclick="closeSheets()" style="flex:1;">Not now</button></div>
+          </div>
+
+          <div class="ah-sheet" id="sheet-info" onclick="event.stopPropagation();">
+            <div class="ah-sheet__grab"></div>
+            <div class="ah-sheet__head"><h3 class="ah-sheet__title" id="info-title">Why this works</h3><button class="ah-sheet__close" onclick="closeSheets()">×</button></div>
+            <p class="ah-body" id="info-body" style="line-height:1.6;color:var(--text-secondary);font-size:13.5px;"></p>
+            <div class="ah-actions" style="margin-top:14px;"><button class="ah-btn" onclick="closeSheets()" style="flex:1;">Continue</button></div>
+          </div>
+
+          <div class="ah-sheet" id="sheet-export" onclick="event.stopPropagation();">
+            <div class="ah-sheet__grab"></div>
+            <div class="ah-sheet__head"><h3 class="ah-sheet__title">Export</h3><button class="ah-sheet__close" onclick="closeSheets()">×</button></div>
+            <p class="ah-caption" style="color:var(--text-secondary);margin-bottom:12px;">Plain YAML, no custom format. Any YAML tool reads it; the app reads it back.</p>
+            <p class="yaml-caps" id="exp-name">decision.yaml</p>
+            <pre class="yaml" id="exp-yaml"></pre>
+            <div class="ah-actions" style="margin-top:12px;">
+              <button class="ah-btn ah-btn--ghost" onclick="copyYaml()">Copy</button>
+              <button class="ah-btn ah-btn--ghost" onclick="downloadYaml()">Download</button>
+              <button class="ah-btn" onclick="closeSheets()">Done</button>
+            </div>
+          </div>
+
+          <div class="ah-sheet" id="sheet-delete" onclick="event.stopPropagation();">
+            <div class="ah-sheet__grab"></div>
+            <div class="ah-sheet__head"><h3 class="ah-sheet__title">Delete this decision?</h3><button class="ah-sheet__close" onclick="closeSheets()">×</button></div>
+            <p class="ah-body" style="color:var(--text-secondary);">Everything you wrote for it goes. It is not kept anywhere.</p>
+            <div class="ah-actions" style="margin-top:14px;"><button class="ah-btn ah-btn--ghost" onclick="closeSheets()" style="flex:1;">Keep it</button><button class="ah-btn ah-btn--danger" onclick="doDelete()" style="flex:1;">Delete it</button></div>
+          </div>
+
+          <div class="ah-sheet" id="sheet-erase1" onclick="event.stopPropagation();">
+            <div class="ah-sheet__grab"></div>
+            <div class="ah-sheet__head"><h3 class="ah-sheet__title">Erase all data?</h3><button class="ah-sheet__close" onclick="closeSheets()">×</button></div>
+            <p class="ah-body" style="color:var(--text-secondary);">Every decision goes. Consider a backup first.</p>
+            <div class="ah-actions" style="margin-top:14px;"><button class="ah-btn ah-btn--ghost" onclick="closeSheets()" style="flex:1;">Back up first</button><button class="ah-btn ah-btn--danger" onclick="openSheet('sheet-erase2')" style="flex:1;">Continue</button></div>
+          </div>
+
+          <div class="ah-sheet" id="sheet-erase2" onclick="event.stopPropagation();">
+            <div class="ah-sheet__grab"></div>
+            <div class="ah-sheet__head"><h3 class="ah-sheet__title">This is the last time it asks</h3><button class="ah-sheet__close" onclick="closeSheets()">×</button></div>
+            <p class="ah-body" style="color:var(--text-secondary);">After this, there is no undo. That is on purpose.</p>
+            <div class="ah-actions" style="margin-top:14px;"><button class="ah-btn ah-btn--ghost" onclick="closeSheets()" style="flex:1;">Keep everything</button><button class="ah-btn ah-btn--danger" onclick="doErase()" style="flex:1;">Erase all data</button></div>
+          </div>
+
+          <div class="ah-sheet" id="sheet-about" onclick="event.stopPropagation();">
+            <div class="ah-sheet__grab"></div>
+            <div class="ah-sheet__head"><h3 class="ah-sheet__title">Settled</h3><button class="ah-sheet__close" onclick="closeSheets()">×</button></div>
+            <p class="ah-body" style="line-height:1.65;color:var(--text-secondary);font-size:13.5px;">
+              A pocket decision coach. It never recommends an option and never implies being torn is a failing.
+              Every method here is a real, named, evidence-backed tool: satisficing, the decision matrix,
+              10/10/10 with a pre-mortem, and the implementation intention.<br><br>
+              Runs entirely on your device. No accounts, no ads, no analytics.<br><br>
+              Created by Rishi Verma · © 2026 · AGPL-3.0
+            </p>
+            <div class="ah-actions" style="margin-top:14px;"><button class="ah-btn" onclick="closeSheets()" style="flex:1;">Continue</button></div>
+          </div>
+        </div>
+
+        <div class="ah-toast" id="toast" aria-live="polite"><div></div></div>
+        <div class="home-indicator"></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="scaffold__note">
+    Tap through: <b>Home</b> · <b>New decision</b> · <b>Stakes</b> · <b>Good enough</b> / <b>Weigh it up</b> / <b>Look ahead</b> · <b>Make it real</b>.
+    Try <b>A different way</b> on any method screen, expand <b>Why this works</b>, view an export from a decided row,
+    and switch <b>Day / Night</b> in Settings. Built on the Ahimsa design system proper: the vendored dist stylesheet
+    (<code>_ahimsa/ahimsa.css</code> + CHECKSUMS + fonts) supplies both aesthetics, every component class and all tokens;
+    Day's canvas carries the family's warm dawn as the one approved root override. Nothing loads over the network.
+    The spec (<code>spec/SPECIFICATION.md</code>) is the authority for the build.
+  </p>
+</div>
+
+<script>
+"use strict";
+/* ─────────────────────── state ─────────────────────── */
+var NOW = '2026-10-08T18:30:00Z';
+var state = {
+  decisions: [
+    { id:'d1', question:'Should I take the new job?', options:[], noOptions:true, stakes:'a-lot', method:'look-ahead',
+      work:{ ten_minutes:'Relieved, a bit scared.', ten_months:'Probably glad I moved.', ten_years:'Won\'t remember the fear.',
+             regret_cause:'The team turns out to be toxic.', regret_guard:'Ask to meet the team first.' },
+      sentence:'I\'m taking the job.', first_step:'Reply to the offer email.', when:'Monday morning',
+      status:'decided', created:'2026-10-08T18:10:00Z', updated:NOW },
+    { id:'d2', question:'Where to get lunch?', options:['The noodle place','The sandwich bar','The salad place'], stakes:'a-little', method:'good-enough',
+      work:{ bar:'Close, cheap, open now.', chosen:'The noodle place' },
+      sentence:'Getting the noodle place.', first_step:'', when:'',
+      status:'decided', created:'2026-10-06T12:20:00Z', updated:'2026-10-06T12:21:00Z' },
+    { id:'d3', question:'Should I move to Lisbon?', options:[], noOptions:true, status:'draft',
+      created:'2026-10-07T09:00:00Z', updated:'2026-10-07T09:00:00Z' }
+  ],
+  draft: null,
+  viewId: null,
+  order: [],
+  weighRows: []
+};
+
+/* ─────────────────────── router ─────────────────────── */
+function nav(id){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('is-active'); });
+  var el = document.getElementById(id);
+  if (el){ el.classList.add('is-active'); var sc = el.querySelector('.screen__scroll'); if (sc) sc.scrollTop = 0; }
+  closeSheets();
+}
+function backHome(){
+  var d = state.draft;
+  var hasWork = d && (d.question || d.stakes || (d.work && Object.keys(d.work).length));
+  if (d && hasWork){
+    d.status = d.stakes ? 'in-progress' : 'draft'; d.updated = NOW;
+    var existing = findDecision(d.id);
+    if (existing){ Object.assign(existing, d); } else { state.decisions.push(d); }
+    toast('Kept as a draft. Nothing you wrote is lost.');
+  }
+  state.draft = null; nav('sc-home'); renderHome();
+}
+function goBack(){
+  if (!state.draft || !state.draft.history || state.draft.history.length === 0){ backHome(); return; }
+  var last = state.draft.history.pop();
+  if (last){ nav(last); }
+}
+
+/* ─────────────────────── home ─────────────────────── */
+function renderHome(){
+  var list = document.getElementById('home-list');
+  var empty = document.getElementById('home-empty');
+  list.innerHTML = '';
+  if (state.decisions.length === 0){ empty.style.display = 'flex'; return; }
+  empty.style.display = 'none';
+  state.decisions.slice().sort(function(a,b){ return b.updated.localeCompare(a.updated); }).forEach(function(d){
+    var row = document.createElement('button');
+    row.className = 'dec-row ah-card ah-card--list is-tappable';
+    var sent = (d.status === 'decided' && d.sentence) ? '<div class="sentence">' + esc(d.sentence) + '</div>' : '';
+    row.innerHTML = '<div class="q">' + esc(d.question) + '</div>' +
+      '<div class="meta"><span class="ah-pill ah-pill--static">' + statusLabel(d) + '</span></div>' + sent;
+    row.addEventListener('click', function(){ openDecision(d.id); });
+    list.appendChild(row);
+  });
+}
+function statusLabel(d){
+  var map = { draft:'Draft', 'in-progress':'In progress', decided:'Decided' };
+  if (d.status === 'decided'){ return 'Decided · ' + shortDate(d.updated); }
+  if (d.status === 'in-progress' && d.method){ return 'In progress · ' + methodName(d.method); }
+  return map[d.status] || d.status;
+}
+function shortDate(iso){ var d = new Date(iso); var m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d.getUTCDate() + ' ' + m[d.getUTCMonth()]; }
+function esc(s){ var div = document.createElement('div'); div.textContent = s; return div.innerHTML; }
+
+/* ─────────────────────── decision view ─────────────────────── */
+function openDecision(id){
+  state.viewId = id;
+  var d = findDecision(id);
+  if (d.status !== 'decided'){
+    state.draft = d;
+    document.getElementById('f-question').value = d.question || '';
+    renderOptions();
+    if (d.method){ startMethod(d.method); } else { nav('sc-stakes'); }
+    return;
+  }
+  var body = document.getElementById('view-body');
+  body.innerHTML =
+    '<div class="meta" style="display:flex;align-items:center;gap:7px;margin:4px 0 6px;"><span class="ah-pill ah-pill--static">' + statusLabel(d) + '</span></div>' +
+    '<p class="ah-heading-l" style="font-size:23px;">' + esc(d.question) + '</p>' +
+    '<div class="ah-card" style="margin-top:14px;"><p class="ah-caps" style="margin-bottom:8px;">The decision</p>' +
+      '<p class="ah-quote ah-quote--md" style="text-align:left;font-size:19px;">' + esc(d.sentence) + '</p>' +
+      (d.first_step ? '<p class="ah-body" style="margin-top:14px;color:var(--text-secondary);"><strong>First step:</strong> ' + esc(d.first_step) + '</p>' : '') +
+      (d.when ? '<p class="ah-body" style="margin-top:4px;color:var(--text-secondary);"><strong>When:</strong> ' + esc(d.when) + '</p>' : '') +
+      '<p class="ah-caption" style="color:var(--text-secondary);margin-top:14px;">Reopening is free. Changing your mind is not failing.</p></div>' +
+    '<div class="ah-card ah-card--list"><p class="ah-caps" style="margin-bottom:8px;">What it held</p>' + stepsHtml(d) + '</div>';
+  document.getElementById('view-actions').classList.remove('hidden');
+  nav('sc-view');
+  renderExport(d);
+}
+function stepsHtml(d){
+  var parts = [];
+  if (d.stakes){ parts.push('<p class="ah-body" style="color:var(--text-secondary);"><strong>Stakes:</strong> ' + esc(d.stakes) + ' · Method: ' + methodName(d.method || '') + '</p>'); }
+  if (d.options && d.options.length){ parts.push('<p class="ah-body" style="color:var(--text-secondary);margin-top:4px;"><strong>Options:</strong> ' + esc(d.options.join(' · ')) + '</p>'); }
+  if (d.noOptions){ parts.push('<p class="ah-body" style="color:var(--text-secondary);margin-top:4px;"><strong>Options:</strong> none, just thinking</p>'); }
+  var w = d.work || {};
+  Object.keys(w).forEach(function(k){
+    var label = workLabel(k);
+    var v = w[k];
+    if (Array.isArray(v)){ v = v.join(' · '); }
+    parts.push('<p class="ah-body" style="color:var(--text-secondary);margin-top:4px;">' + label + ' <span style="color:var(--text-body);">' + esc(String(v)) + '</span></p>');
+  });
+  return parts.join('') || '<p class="ah-body" style="color:var(--text-muted);">Nothing yet. It was a draft.</p>';
+}
+function workLabel(k){
+  var map = { bar:'Bar ·', chosen:'Chosen ·', ten_minutes:'Ten minutes ·', ten_months:'Ten months ·', ten_years:'Ten years ·',
+    regret_cause:'Most likely cause ·', regret_guard:'Guard ·', criteria:'Criteria ·' };
+  return map[k] || (k + ' ·');
+}
+
+/* ─────────────────────── new decision ─────────────────────── */
+function openNew(){ newDecisionWith(''); }
+function newDecisionWith(q){
+  state.draft = { id:'d' + Math.random().toString(16).slice(2,10), question:q || '', options:[], noOptions:false, history:[] };
+  document.getElementById('f-question').value = state.draft.question;
+  renderOptions();
+  nav('sc-new');
+}
+function renderOptions(){
+  var wrap = document.getElementById('opt-list');
+  wrap.innerHTML = '';
+  state.draft.options.forEach(function(o, i){
+    var row = document.createElement('div'); row.className = 'opt-row';
+    var fld = document.createElement('div'); fld.className = 'ah-field';
+    var input = document.createElement('input'); input.type = 'text'; input.value = o;
+    input.setAttribute('aria-label', 'Option ' + (i+1));
+    input.addEventListener('input', function(){ state.draft.options[i] = input.value; });
+    fld.appendChild(input);
+    var del = document.createElement('button'); del.textContent = '×'; del.setAttribute('aria-label', 'Remove option');
+    del.addEventListener('click', function(){ state.draft.options.splice(i,1); renderOptions(); });
+    row.appendChild(fld); row.appendChild(del);
+    wrap.appendChild(row);
+  });
+  document.getElementById('btn-nothink').classList.toggle('is-selected', state.draft.noOptions);
+  document.getElementById('noopt-note').classList.toggle('hidden', !state.draft.noOptions);
+}
+function addOption(){ if (state.draft.options.length < 8){ state.draft.noOptions = false; state.draft.options.push(''); renderOptions(); } }
+function toggleNoOptions(){ state.draft.noOptions = !state.draft.noOptions; if (state.draft.noOptions){ state.draft.options = []; } renderOptions(); }
+function toStakes(){
+  state.draft.question = document.getElementById('f-question').value.trim();
+  if (!state.draft.question){ toast('A question first. It can be small.'); return; }
+  state.draft.status = 'draft';
+  document.querySelectorAll('#sc-stakes .stake').forEach(function(s){ s.classList.remove('is-selected'); });
+  document.getElementById('btn-stakes-go').classList.add('is-disabled');
+  nav('sc-stakes');
+}
+function setStakes(el){
+  var v = el.getAttribute('data-stakes');
+  state.draft.stakes = v;
+  document.querySelectorAll('#sc-stakes .stake').forEach(function(s){ s.classList.toggle('is-selected', s === el); });
+  document.getElementById('btn-stakes-go').classList.remove('is-disabled');
+}
+
+/* ─────────────────────── the engine ─────────────────────── */
+function engineMethod(d){
+  if (d.stakes === 'a-little'){ return 'good-enough'; }
+  var n = d.options ? d.options.length : 0;
+  if (d.stakes === 'somewhat'){ return n >= 2 ? 'weigh-it-up' : 'look-ahead'; }
+  return 'look-ahead'; // a-lot
+}
+function toMethod(){
+  var m = engineMethod(state.draft);
+  state.draft.method = m;
+  state.draft.history = [ 'sc-' + stepName(m, 1) ];
+  startMethod(m);
+}
+function startMethod(m){
+  if (m === 'good-enough'){
+    document.getElementById('ge-bar-val').value = (state.draft.work && state.draft.work.bar) || '';
+    document.getElementById('ge-bar-n').textContent = 'Step 1 of 2';
+    nav('sc-ge-bar');
+  } else if (m === 'weigh-it-up'){
+    prepWeigh();
+    nav('sc-wp-crit');
+  } else {
+    prepLookAhead();
+    nav('sc-la-a');
+  }
+}
+function stepName(m, i){
+  if (m === 'good-enough'){ return ['ge-bar','ge-check','ge-result'][i-1]; }
+  if (m === 'weigh-it-up'){ return ['wp-crit','wp-weight','wp-score','wp-rank'][i-1]; }
+  return ['la-a','la-b','la-c','la-reg','la-read'][i-1];
+}
+
+/* ─────────────────────── good enough ─────────────────────── */
+function geToCheck(){
+  var bar = document.getElementById('ge-bar-val').value.trim();
+  if (!bar){ toast('The bar first. One line is enough.'); return; }
+  state.draft.work = state.draft.work || {}; state.draft.work.bar = bar;
+  state.draft.geIndex = 0; state.draft.geAside = [];
+  geRenderCheck();
+}
+function geOptions(){
+  if (state.draft.options && state.draft.options.length){ return state.draft.options; }
+  return [];
+}
+function geRenderCheck(){
+  var opts = geOptions();
+  var note = document.getElementById('ge-check-q');
+  var cur = document.getElementById('ge-check-cur');
+  if (opts.length === 0){
+    note.textContent = 'No options, so the bar is the test. Does the plain act clear it?';
+    cur.innerHTML = '<p style="font-family:var(--font-display);font-size:18px;color:var(--text-heading);margin:0;">' + esc(state.draft.question) + '</p>' +
+      '<p class="ah-caption" style="color:var(--text-secondary);margin:8px 0 0;">Your bar: ' + esc(state.draft.work.bar) + '</p>';
+  } else {
+    var i = state.draft.geIndex;
+    if (i >= opts.length){ geResultNothing(); return; }
+    note.textContent = 'Option ' + (i+1) + ' of ' + opts.length + '. The first yes is yours.';
+    cur.innerHTML = '<p style="font-family:var(--font-display);font-size:18px;color:var(--text-heading);margin:0;">' + esc(opts[i]) + '</p>' +
+      '<p class="ah-caption" style="color:var(--text-secondary);margin:8px 0 0;">Your bar: ' + esc(state.draft.work.bar) + '</p>';
+  }
+  nav('sc-ge-check');
+}
+function geMark(ans){
+  var opts = geOptions();
+  if (opts.length === 0){
+    if (ans === 'yes'){ state.draft.work.chosen = 'the act'; geResult(true); }
+    else if (ans === 'notsure'){ stopNow(); toast('Kept open. A decision is not a deadline.'); }
+    else { geResultNothing(); }
+    return;
+  }
+  var i = state.draft.geIndex;
+  var current = opts[i];
+  if (ans === 'yes'){ state.draft.work.chosen = current; geResult(true); }
+  else if (ans === 'notsure'){ state.draft.geAside.push(current); state.draft.geIndex++; geRenderCheck(); }
+  else { state.draft.geIndex++; geRenderCheck(); }
+}
+function geResult(cleared){
+  document.getElementById('ge-result-title').textContent = cleared ? 'Then take it.' : 'Nothing here clears the bar.';
+  document.getElementById('ge-result-sub').textContent = cleared
+    ? (state.draft.work.chosen === 'the act' ? 'It clears the bar.' : 'It clears the bar. ' + esc(state.draft.work.chosen) + ' is your answer.')
+    : 'That is an answer too: don\'t pick one of these for the sake of it.';
+  nav('sc-ge-result');
+}
+function geResultNothing(){ geResult(false); }
+
+/* ─────────────────────── weigh it up ─────────────────────── */
+function prepWeigh(){
+  state.order = [];
+  state.draft.work = state.draft.work || {};
+  var n = state.draft.options ? state.draft.options.length : 0;
+  if (n < 2 && !state.draft.work.rowsSeeded){
+    state.weighRows = n === 1 ? [ state.draft.options[0], 'Leave it as it is' ] : [ 'Do it', 'Leave it as it is' ];
+    state.draft.work.rowsSeeded = true;
+  } else {
+    state.weighRows = state.draft.options ? state.draft.options.slice() : [];
+  }
+  state.draft.work.criteria = state.draft.work.criteria || [];
+  if (state.draft.work.criteria.length === 0){ state.draft.work.criteria = ['', '']; }
+  state.draft.work.weights = state.draft.work.weights || {};
+  state.draft.work.scores = state.draft.work.scores || {};
+  renderCrit();
+}
+function renderCrit(){
+  var wrap = document.getElementById('crit-list');
+  wrap.innerHTML = '';
+  (state.draft.work.criteria || []).forEach(function(c, i){
+    var row = document.createElement('div'); row.className = 'crit-row';
+    var fld = document.createElement('div'); fld.className = 'ah-field';
+    var input = document.createElement('input'); input.type = 'text'; input.value = c;
+    input.setAttribute('aria-label', 'Criterion ' + (i+1));
+    input.addEventListener('input', function(){ state.draft.work.criteria[i] = input.value; });
+    fld.appendChild(input);
+    var del = document.createElement('button'); del.textContent = '×'; del.setAttribute('aria-label','Remove criterion');
+    del.addEventListener('click', function(){ state.draft.work.criteria.splice(i,1); state.draft.work.scores = {}; renderCrit(); });
+    row.appendChild(fld); row.appendChild(del);
+    wrap.appendChild(row);
+  });
+  var widen = document.getElementById('wp-widen');
+  if (state.weighRows.length >= 8){ widen.classList.add('hidden'); } else { widen.classList.remove('hidden'); }
+}
+function addCrit(){ var c = state.draft.work.criteria || (state.draft.work.criteria = []); if (c.length < 5){ c.push(''); renderCrit(); } }
+function wpToWeights(){
+  var c = (state.draft.work.criteria || []).map(function(x){ return x.trim(); }).filter(Boolean);
+  if (c.length < 2){ toast('Two things that matter at least. That is the honest minimum.'); return; }
+  state.draft.work.criteria = c;
+  renderWeights();
+  nav('sc-wp-weight');
+}
+function renderWeights(){
+  var wrap = document.getElementById('weight-list');
+  wrap.innerHTML = '';
+  state.draft.work.criteria.forEach(function(c){
+    var card = document.createElement('div'); card.className = 'ah-card ah-card--list';
+    var w = state.draft.work.weights[c] || 0;
+    card.innerHTML = '<p style="font-family:var(--font-display);font-size:16px;color:var(--text-heading);margin:0 0 12px;">' + esc(c) + '</p>' +
+      '<div class="ah-actions ah-actions--eq"><span class="ah-hit" style="flex:1;"><button class="ah-chip" data-w="1">A little</button></span>' +
+      '<span class="ah-hit" style="flex:1;"><button class="ah-chip" data-w="2">Somewhat</button></span>' +
+      '<span class="ah-hit" style="flex:1;"><button class="ah-chip" data-w="3">A lot</button></span></div>';
+    var chips = card.querySelectorAll('.ah-chip');
+    chips.forEach(function(btn){ if (parseInt(btn.getAttribute('data-w'),10) === w){ btn.classList.add('is-selected'); }
+      btn.addEventListener('click', function(){ chips.forEach(function(b){ b.classList.remove('is-selected'); }); btn.classList.add('is-selected');
+        state.draft.work.weights[c] = parseInt(btn.getAttribute('data-w'),10); });
+    });
+    wrap.appendChild(card);
+  });
+}
+function wpToScores(){
+  var weights = state.draft.work.weights;
+  var missing = state.draft.work.criteria.filter(function(c){ return !weights[c]; });
+  if (missing.length){ toast('Every thing that matters needs a weight. Even a little is one.'); return; }
+  renderScores();
+  nav('sc-wp-score');
+}
+function renderScores(){
+  var rows = state.weighRows;
+  var crits = state.draft.work.criteria;
+  var grid = document.getElementById('score-grid');
+  var html = '<table class="mk-grid"><thead><tr><th>Options</th>';
+  crits.forEach(function(c){ html += '<th>' + esc(c) + '</th>'; });
+  html += '</tr></thead><tbody>';
+  rows.forEach(function(r, ri){
+    html += '<tr><td class="g-opt">' + esc(r) + '</td>';
+    crits.forEach(function(c, ci){
+      var key = ri + ':' + ci;
+      var v = (state.draft.work.scores[key] === undefined) ? 0 : state.draft.work.scores[key];
+      html += '<td><button class="cell" data-cell="' + key + '" data-v="' + v + '" aria-label="' + esc(r) + ' on ' + esc(c) + '"><i></i><i></i></button></td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  grid.innerHTML = html;
+  grid.querySelectorAll('.cell').forEach(function(btn){
+    paintCell(btn);
+    btn.addEventListener('click', function(){ state.draft.work.scores[btn.getAttribute('data-cell')] = (parseInt(btn.getAttribute('data-v'),10) + 1) % 3; renderScores(); });
+  });
+}
+function paintCell(btn){
+  var v = state.draft.work.scores[btn.getAttribute('data-cell')] || 0;
+  var dots = btn.querySelectorAll('i');
+  dots.forEach(function(d, i){ d.classList.remove('is-on'); if (i < v){ d.classList.add('is-on'); } });
+  btn.classList.remove('is-1','is-2');
+  if (v === 1){ btn.classList.add('is-1'); } else if (v === 2){ btn.classList.add('is-2'); }
+  btn.setAttribute('data-v', v);
+}
+function wpToRank(){
+  var rows = state.weighRows;
+  var crits = state.draft.work.criteria;
+  var sums = rows.map(function(r, ri){
+    var total = 0;
+    crits.forEach(function(c, ci){ var k = ri + ':' + ci; var w = state.draft.work.weights[c] || 2; total += w * (state.draft.work.scores[k] || 0); });
+    return { name: r, sum: total };
+  });
+  state.order = sums.slice().sort(function(a,b){ return b.sum - a.sum; });
+  var list = document.getElementById('rank-list');
+  list.innerHTML = '';
+  state.order.forEach(function(o, i){
+    var item = document.createElement('div');
+    item.className = 'rank-item';
+    var num = document.createElement('span');
+    num.className = 'ah-mono ah-mono--s20' + (i === 0 ? '' : ' ah-mono--sunk');
+    num.textContent = i + 1;
+    var lab = document.createElement('span'); lab.className = 'rank-item__t'; lab.textContent = o.name;
+    item.appendChild(num); item.appendChild(lab);
+    list.appendChild(item);
+  });
+  nav('sc-wp-rank');
+}
+
+/* ─────────────────────── look ahead ─────────────────────── */
+function prepLookAhead(){
+  state.draft.work = state.draft.work || {};
+  document.getElementById('la-a-val').value = state.draft.work.ten_minutes || '';
+  document.getElementById('la-b-val').value = state.draft.work.ten_months || '';
+  document.getElementById('la-c-val').value = state.draft.work.ten_years || '';
+  document.getElementById('la-reg-cause').value = state.draft.work.regret_cause || '';
+  document.getElementById('la-reg-guard').value = state.draft.work.regret_guard || '';
+  document.getElementById('la-read-sum').textContent = 'Your three horizons, side by side. The gaps are usually the message.';
+}
+function laNext(){
+  var a = document.getElementById('la-a-val').value.trim(), b = document.getElementById('la-b-val').value.trim(),
+      c = document.getElementById('la-c-val').value.trim(), rc = document.getElementById('la-reg-cause').value.trim(),
+      rg = document.getElementById('la-reg-guard').value.trim();
+  var w = state.draft.work;
+  if (a) w.ten_minutes = a; if (b) w.ten_months = b; if (c) w.ten_years = c; if (rc) w.regret_cause = rc; if (rg) w.regret_guard = rg;
+  var cur = document.querySelector('section.screen.is-active');
+  var ids = ['sc-la-a','sc-la-b','sc-la-c','sc-la-reg','sc-la-read'];
+  var idx = ids.indexOf(cur.id);
+  if (idx < 3){ nav(ids[idx+1]); }
+  else if (idx === 3){ laRead(); nav('sc-la-read'); }
+  else { toReal(); }
+}
+function laRead(){
+  var w = state.draft.work;
+  var list = document.getElementById('la-read-list');
+  var rows = [
+    { n:'10 min', t: w.ten_minutes || 'Nothing written, and that is fine.' },
+    { n:'10 months', t: w.ten_months || 'Nothing written, and that is fine.' },
+    { n:'10 years', t: w.ten_years || 'Nothing written, and that is fine.' }
+  ];
+  list.innerHTML = '';
+  rows.forEach(function(r){
+    var item = document.createElement('div'); item.className = 'rank-item';
+    var num = document.createElement('span');
+    num.className = 'ah-mono ah-mono--s20 ah-mono--sunk';
+    num.style.width = 'auto'; num.style.minWidth = '34px'; num.style.padding = '0 6px'; num.style.fontSize = '10px';
+    num.textContent = r.n;
+    var lab = document.createElement('span'); lab.className = 'rank-item__t'; lab.style.fontWeight = '400'; lab.textContent = r.t;
+    item.appendChild(num); item.appendChild(lab);
+    list.appendChild(item);
+  });
+}
+
+/* ─────────────────────── make it real / save ─────────────────────── */
+function toReal(){
+  document.getElementById('r-sentence').value = state.draft.sentence || '';
+  document.getElementById('r-step').value = state.draft.first_step || '';
+  document.getElementById('r-when').value = state.draft.when || '';
+  nav('sc-real');
+}
+function saveDecision(){
+  var s = document.getElementById('r-sentence').value.trim();
+  if (!s){ toast('The sentence first. One honest line.'); return; }
+  var d = state.draft;
+  d.sentence = s; d.first_step = document.getElementById('r-step').value.trim(); d.when = document.getElementById('r-when').value.trim();
+  d.status = 'decided'; d.updated = NOW;
+  var existing = findDecision(d.id);
+  if (existing){ Object.assign(existing, d); } else { state.decisions.push(d); }
+  state.draft = null;
+  renderHome();
+  nav('sc-home');
+  toast('Saved. The decision is yours to reopen any time.');
+}
+function stopNow(){
+  var d = state.draft;
+  if (d){ d.status = d.stakes ? 'in-progress' : 'draft'; d.updated = NOW;
+    var existing = findDecision(d.id);
+    if (existing){ Object.assign(existing, d); } else { state.decisions.push(d); }
+  }
+  state.draft = null;
+  renderHome(); nav('sc-home');
+  toast('Kept as a draft. Nothing you wrote is lost.');
+}
+
+/* ─────────────────────── a different way ─────────────────────── */
+function openWays(){
+  var m = state.draft.method;
+  var map = {
+    'good-enough': [ {m:'weigh-it-up', t:'Weigh it up', d:'For a slower pass, when you want the trade-offs on paper.'},
+                     {m:'look-ahead', t:'Look ahead', d:'For the long view, when feelings are loud.'} ],
+    'weigh-it-up': [ {m:'good-enough', t:'Good enough', d:'For the quick version. A bar, not a spreadsheet.'},
+                     {m:'look-ahead', t:'Look ahead', d:'For the long view, when feelings are loud.'} ],
+    'look-ahead': [ {m:'good-enough', t:'Good enough', d:'For the quick version. A bar, not a spreadsheet.'},
+                    {m:'weigh-it-up', t:'Weigh it up', d:'For a slower pass, when you want the trade-offs on paper.'} ]
+  };
+  var wrap = document.getElementById('ways-list');
+  wrap.innerHTML = '';
+  var engine = engineMethod(state.draft);
+  document.getElementById('ways-sub').textContent = engine === m
+    ? 'The engine suggested this one for ' + state.draft.stakes + ' stakes. Either other one is still a real tool.'
+    : 'The engine would have suggested ' + methodName(engine) + '. Either other one is still a real tool.';
+  map[m].forEach(function(o){
+    var b = document.createElement('button');
+    b.className = 'ah-card ah-card--list';
+    b.innerHTML = '<span class="t" style="display:block;font-size:14px;font-weight:600;color:var(--text-heading);">' + o.t + '</span>' +
+      '<span class="d" style="display:block;font-size:11.5px;color:var(--text-muted);margin-top:3px;line-height:1.4;">' + o.d + '</span>';
+    b.addEventListener('click', function(){
+      state.draft.method = o.m; closeSheets();
+      state.draft.work = state.draft.work || {};
+      startMethod(o.m);
+      toast('Switched to ' + o.t + '. What you wrote stays when the method can use it.');
+    });
+    wrap.appendChild(b);
+  });
+  openSheet('sheet-ways');
+}
+function methodName(m){ return { 'good-enough':'Good enough', 'weigh-it-up':'Weigh it up', 'look-ahead':'Look ahead', 'make-it-real':'Make it real' }[m] || m; }
+
+/* ─────────────────────── why this works ─────────────────────── */
+var INFO = {
+  'good-enough': ['Satisficing', 'This is satisficing, the idea Herbert Simon won a Nobel Prize for: a good enough result, chosen quickly, beats the perfect one chosen too late, and people who settle report less regret.'],
+  'weigh-it-up': ['The decision matrix', 'This is a decision matrix, the method engineers use to compare real choices. Writing the trade-offs down gets them out of your head, and giving each a weight makes the comparison honest instead of swirling.'],
+  'look-ahead': ['10/10/10 and the pre-mortem', 'This is the 10/10/10 rule (Suzy Welch) plus a pre-mortem (Gary Klein). Stepping out in time quiets emotional noise, and imagining the failure first surfaces about a third more of the risks, so fear becomes a guardable plan.'],
+  'make-it-real': ['The implementation intention', 'This is an implementation intention, one of the most tested results in behavior science: a decision with a first step and a time is far more likely to actually happen.']
+};
+function openInfo(k){
+  var i = INFO[k] || ['', ''];
+  document.getElementById('info-title').textContent = i[0];
+  document.getElementById('info-body').textContent = i[1];
+  openSheet('sheet-info');
+}
+
+/* ─────────────────────── export ─────────────────────── */
+var exportDecision = null;
+function renderExport(d){ exportDecision = d; }
+function openExport(){
+  var d = exportDecision || (state.draft && Object.assign({}, state.draft));
+  if (!d){ toast('Nothing to export yet.'); return; }
+  document.getElementById('exp-name').textContent = 'settled-' + slug(d.question) + '.yaml';
+  document.getElementById('exp-yaml').textContent = buildYaml(d);
+  openSheet('sheet-export');
+}
+function buildYaml(d){
+  var L = [];
+  var q = JSON.stringify;
+  L.push('# A Settled export: your decisions, in plain YAML.');
+  L.push('# Read it top to bottom, or re-import it at https://settled.riverma.com');
+  L.push('settled: "1.0"');
+  L.push('exported: ' + q(new Date().toISOString()));
+  L.push('decisions:');
+  L.push('  - id: ' + q(d.id));
+  L.push('    question: ' + q(d.question));
+  L.push('    options: ' + (d.options && d.options.length ? q(d.options) : '[]') + (d.noOptions ? '  # empty = just thinking' : ''));
+  if (d.stakes){ L.push('    stakes: ' + d.stakes); }
+  if (d.method){ L.push('    method: ' + d.method); }
+  var w = d.work || {};
+  var wk = Object.keys(w).filter(function(k){ return k !== 'criteria' && k !== 'weights' && k !== 'scores' && k !== 'rowsSeeded'; });
+  if (wk.length || w.criteria){
+    L.push('    work:');
+    if (w.criteria){ L.push('      criteria:'); w.criteria.forEach(function(c, i){ L.push('        - { name: ' + q(c) + ', weight: ' + (w.weights ? w.weights[c] || 2 : 2) + ' }'); }); }
+    if (w.scores){
+      L.push('      scores:');
+      var byRow = {};
+      Object.keys(w.scores).forEach(function(k){ var parts = k.split(':'); (byRow[parts[0]] = byRow[parts[0]] || [])[parts[1]] = w.scores[k]; });
+      Object.keys(byRow).sort().forEach(function(ri){ L.push('        ' + ri + ': ' + JSON.stringify(byRow[ri].map(function(x){ return +x; }))); });
+    }
+    var wmap = { bar:'bar', chosen:'chosen', ten_minutes:'ten_minutes', ten_months:'ten_months', ten_years:'ten_years', regret_cause:'regret_cause', regret_guard:'regret_guard' };
+    wk.forEach(function(k){ L.push('      ' + (wmap[k] || k) + ': ' + q(w[k])); });
+  }
+  L.push('    sentence: ' + q(d.sentence || ''));
+  L.push('    first_step: ' + q(d.first_step || ''));
+  L.push('    when: ' + q(d.when || ''));
+  L.push('    status: ' + (d.status || 'draft'));
+  L.push('    created: ' + q(d.created || new Date().toISOString()));
+  L.push('    updated: ' + q(d.updated || new Date().toISOString()));
+  return L.join('\n');
+}
+function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'decision'; }
+function copyYaml(){
+  var t = document.getElementById('exp-yaml').textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ toast('Copied to the clipboard.'); }); }
+  else { toast('Select the text above and copy it.'); }
+}
+function downloadYaml(){
+  var t = document.getElementById('exp-yaml').textContent;
+  var fname = document.getElementById('exp-name').textContent;
+  var blob = new Blob([t], { type: 'text/yaml' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  toast('Downloaded ' + fname + '. Plain YAML, yours to keep.');
+}
+
+/* ─────────────────────── delete / erase ─────────────────────── */
+function openDelete(){ openSheet('sheet-delete'); }
+function doDelete(){
+  closeSheets();
+  var id = state.viewId;
+  state.decisions = state.decisions.filter(function(d){ return d.id !== id; });
+  state.draft = null; state.viewId = null;
+  renderHome(); nav('sc-home');
+  toast('Deleted. Nothing else changed.');
+}
+function doErase(){
+  closeSheets();
+  state.decisions = [];
+  state.draft = null;
+  renderHome(); nav('sc-home');
+  toast('Everything is gone, and that was the point.');
+}
+
+/* ─────────────────────── theme ─────────────────────── */
+function setTheme(t){
+  var html = document.documentElement;
+  html.classList.remove('ahimsa-day', 'ahimsa-night');
+  html.classList.add('ahimsa-' + t);
+  document.getElementById('th-day').classList.toggle('is-selected', t === 'day');
+  document.getElementById('th-night').classList.toggle('is-selected', t === 'night');
+}
+
+/* ─────────────────────── sheets & toast ─────────────────────── */
+function openSheet(id){
+  document.getElementById('bd').classList.remove('hidden');
+  document.getElementById(id).classList.add('is-open');
+}
+function closeSheets(){
+  document.querySelectorAll('.ah-sheet').forEach(function(s){ s.classList.remove('is-open'); });
+  document.getElementById('bd').classList.add('hidden');
+}
+var toastTimer = null;
+function toast(msg){
+  var t = document.getElementById('toast');
+  t.firstElementChild.textContent = msg;
+  t.classList.add('is-visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('is-visible'); }, 2400);
+}
+
+/* ─────────────────────── helpers ─────────────────────── */
+function findDecision(id){ for (var i = 0; i < state.decisions.length; i++){ if (state.decisions[i].id === id) return state.decisions[i]; } return null; }
+
+/* ─────────────────────── boot ─────────────────────── */
+renderHome();
+document.getElementById('th-day').classList.add('is-selected');
+</script>
+</body>
+</html>
