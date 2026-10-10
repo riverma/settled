@@ -5,6 +5,32 @@ and versions follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-10
+
+### Fixed
+
+- **Leaving a blank decision no longer saves an empty draft.** Tapping New decision and
+  then going Home without writing anything now discards the draft, so empty untitled rows
+  no longer appear on the home list.
+- **Good enough resume no longer lands on the wrong option.** The option cursor is reset
+  when a decision is reopened, so a resumed decision never shows a blank or stale option.
+- **The widen nudge now actually adds a scoreable option.** Adding an option inside Weigh
+  it up keeps the scoring matrix and the final ordering in step with the options list.
+- **"The act" is no longer saved as a chosen option.** A no-options Good enough "yes" no
+  longer writes an internal marker into the decision or the export.
+- **Removing a criterion says why the fit marks cleared.** The scores reset is no longer
+  silent, and a status history recording no longer grows unbounded on reopen and save.
+
+### Changed
+
+- **Screen copy now reads as decision language.** The Good enough bar screen asks you to
+  name the smallest bar the decision would be glad to clear; the New and Stakes screens
+  stop using the word "sent" and stop name-dropping methods before they exist; the Look
+  ahead first horizon reads "each way it could go" instead of assuming two sides; and the
+  decision view shows the stakes in words, not the raw key.
+- **Settings gains a "Why 'Settled'" note.** The name is explained, and the version string
+  stays visible.
+
 ## [0.1.1] - 2026-10-10
 
 ### Fixed
@@ -39,5 +65,6 @@ and versions follow [Semantic Versioning](https://semver.org).
 - **A pocket PWA.** Installs, runs offline on a warm Day theme or a calm Night theme, and
   works with no network at all once loaded.
 
+[0.2.0]: https://github.com/riverma/settled/releases/tag/v0.2.0
 [0.1.1]: https://github.com/riverma/settled/releases/tag/v0.1.1
 [0.1.0]: https://github.com/riverma/settled/releases/tag/v0.1.0

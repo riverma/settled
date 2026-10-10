@@ -34,7 +34,7 @@
       <div class="stepmark"><span class="ah-caps">Step {step} of 5</span><span class="stepmark__bar"><span class="stepmark__fill" style="width: {step * 20}%"></span></span></div>
       <p class="ah-heading-l">{heading()}</p>
       <p class="ah-caption caption-sub">
-        {#if step === 1}How will you feel about each side, ten minutes after you choose?
+        {#if step === 1}How will you feel about each way it could go, ten minutes after you choose?
         {:else if step === 2}The same question, further out.
         {:else}This one usually dissolves the noise.{/if}
       </p>

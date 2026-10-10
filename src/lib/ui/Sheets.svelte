@@ -48,7 +48,7 @@
         </button>
       {/each}
     </div>
-    <div class="ah-actions" style="margin-top: 14px;"><button class="ah-btn ah-btn--ghost" style="flex: 1;" onclick={() => (app.sheet = null)}>{T.dontAsk}</button></div>
+    <div class="ah-actions" style="margin-top: 14px;"><button class="ah-btn ah-btn--ghost" style="flex: 1;" onclick={() => (app.sheet = null)}>{T.stay}</button></div>
   </div>
 
   <!-- Why this works -->

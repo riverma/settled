@@ -5,7 +5,7 @@
   const screen = $derived(app.screen);
   const draft = $derived(app.draft);
   const current = $derived(app.geCurrentOption());
-  const cleared = $derived(!!draft?.work.chosen);
+  const cleared = $derived(app.geCleared);
   const opts = $derived(draft?.options ?? []);
 
   function back(): void {
@@ -23,11 +23,14 @@
     <div class="scroll">
       <div class="stepmark"><span class="ah-caps">Step 1 of 2</span><span class="stepmark__bar"><span class="stepmark__fill" style="width: 50%"></span></span></div>
       <p class="ah-heading-l">What would good enough look like?</p>
-      <p class="ah-caption caption-sub">Not the perfect result. A result you would be glad to accept.</p>
+      <p class="ah-caption caption-sub">Name the smallest bar this decision would be glad to clear. When something clears it, you can stop looking and go.</p>
       <div class="ah-field ah-field--essence" style="margin-top: 8px;">
         <textarea value={draft?.work.bar ?? ''} placeholder="Close, cheap, open now" style="min-height: 70px;"
           oninput={(e) => app.geBar((e.currentTarget as HTMLTextAreaElement).value)}></textarea>
       </div>
+      {#if opts.length === 0}
+        <p class="ah-caption caption-sub">Since you have no options down yet, the bar is the whole test. Does what you might do clear it?</p>
+      {/if}
       <p class="ah-caption caption-sub">Why this works: <button class="mk-link" onclick={() => app.openInfo(METHOD_INFO['good-enough'].title, METHOD_INFO['good-enough'].body)}>satisficing</button>.</p>
     </div>
     <div class="footer-actions">
@@ -43,7 +46,7 @@
       <div class="stepmark"><span class="ah-caps">Step 2 of 2</span><span class="stepmark__bar"><span class="stepmark__fill" style="width: 100%"></span></span></div>
       <p class="ah-heading-l">Does it clear the bar?</p>
       <p class="ah-caption caption-sub" id="ge-check-q">
-        {#if opts.length === 0}No options, so the bar is the test. Does the plain act clear it?{:else}Checking options, in order. The first yes is yours.{/if}
+        {#if opts.length === 0}No options, so the bar is the only test. Does what you might do clear it?{:else}Checking options, in order. The first yes is yours.{/if}
       </p>
       <div class="ah-card ah-card--list">
         {#if opts.length === 0}
@@ -66,7 +69,7 @@
       <p class="ah-heading-l" id="ge-result-title">{cleared ? 'Then take it.' : 'Nothing here clears the bar.'}</p>
       <p class="ah-quote ah-quote--md" id="ge-result-sub" style="text-align: left; color: var(--text-secondary);">
         {cleared
-          ? draft?.work.chosen === 'the act'
+          ? opts.length === 0
             ? 'It clears the bar.'
             : `It clears the bar. ${draft?.work.chosen} is your answer.`
           : "That is an answer too: don't pick one of these for the sake of it."}

@@ -2,6 +2,9 @@
   import { app } from '$lib/store.svelte';
   import { T } from '$lib/strings';
   import { statusLabel, shortDate, methodName } from '$lib/core/types';
+  import { STAKES } from '$lib/strings';
+
+  const stakeWord = (k?: string) => STAKES.find((s) => s.key === k)?.word;
 
   const d = $derived(app.viewed());
   const label = $derived.by(() => (d ? `${statusLabel(d)} · ${shortDate(d.updated)}` : ''));
@@ -9,7 +12,7 @@
   const workRows = $derived.by(() => {
     if (!d) return [];
     const rows: { label: string; value: string }[] = [];
-    if (d.stakes) rows.push({ label: 'Stakes', value: `${d.stakes} · Method: ${methodName(d.method)}` });
+    if (d.stakes) rows.push({ label: 'Stakes', value: `${stakeWord(d.stakes) ?? d.stakes} · Method: ${methodName(d.method)}` });
     if (d.options.length) rows.push({ label: 'Options', value: d.options.join(' · ') });
     if (d.noOptions && !d.options.length) rows.push({ label: 'Options', value: 'none, just thinking' });
     const w = d.work ?? {};

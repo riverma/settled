@@ -35,6 +35,11 @@
       <p class="ah-caption caption-sub" style="margin: 12px 0 0;">Every export is one plain YAML file, yours to keep anywhere. Nothing ever leaves the device unless you choose to.</p>
     </div>
 
+    <div class="ah-card ah-card--list">
+      <p class="ah-caps" style="margin-bottom: 6px;">Why "Settled"</p>
+      <p class="ah-body" style="color: var(--text-secondary);">The name is the feeling after you decide, not the app deciding for you. Settled never picks your answer. It lends just enough structure to un-stick the loop, then gets out of your way.</p>
+    </div>
+
     <button class="ah-card ah-card--list is-tappable" style="text-align:left;width:100%;background:var(--surface-elevated);" onclick={() => (app.sheet = 'about')}>
       <p class="ah-caps" style="margin-bottom: 6px;">About</p>
       <p class="ah-body" style="color: var(--text-secondary);">Settled v{__APP_VERSION__} · AGPL-3.0 · offline · no accounts · no analytics</p>

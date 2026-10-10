@@ -1,6 +1,6 @@
 // Simulation-of-record equivalent of the mockup's state, on real persistence.
 // Svelte 5 runes; everything reactive that the screens read.
-import type { Decision, Method, Stakes } from './core/types';
+import type { Decision, Method, Stakes, Status } from './core/types';
 import { suggest } from './core/engine';
 import { newDecision } from './core/types';
 import { db, deleteDecisionRow, loadDecisions, loadPref, putDecision, savePref, wipeAll } from './db';
@@ -29,9 +29,16 @@ export class AppStore {
   toastMsg = $state<string | null>(null);
   /** Session undo: the last deleted decision, restorable from the toast. */
   undo = $state<Decision | null>(null);
-  /** Weigh-it-up working rows (seeded with the status-quo baseline when binary). */
-  weighRows = $state<string[]>([]);
+  /** Weigh-it-up rows. Derived from the draft's options so they can never drift. */
+  get weighRows(): string[] {
+    const opts = this.draft?.options ?? [];
+    if (opts.length >= 2) return [...opts];
+    if (opts.length === 1) return [opts[0], 'Leave it as it is'];
+    return ['Do it', 'Leave it as it is'];
+  }
   geIndex = $state(0);
+  /** Good enough result: whether the bar was cleared by the person (not persisted). */
+  geCleared = $state(false);
   exportText = $state('');
   exportName = $state('settled.yaml');
   importText = $state('');
@@ -82,6 +89,10 @@ export class AppStore {
       this.draft = clone(d);
       if (d.method) {
         const first = this.firstStep(d.method);
+        // Reset per-pass session state so a resumed method never inherits a stale
+        // index or a stale "cleared" flag from the previous decision.
+        this.geIndex = 0;
+        this.geCleared = false;
         this.nav(first === undefined ? 'stakes' : first);
       } else {
         this.nav('stakes');
@@ -127,7 +138,9 @@ export class AppStore {
   toggleNoOptions(): void {
     if (!this.draft) return;
     this.draft.noOptions = !this.draft.noOptions;
-    if (this.draft.noOptions) this.draft.options = [];
+    // Keep any options the person has already typed. `noOptions` means "I am just
+    // thinking", and the engine treats an empty options list the same way; erasing
+    // silently would throw away their words.
   }
 
   toStakes(): void {
@@ -153,18 +166,12 @@ export class AppStore {
     this.prepMethod(m);
     const first = this.firstStep(m);
     this.geIndex = 0;
+    this.geCleared = false;
     if (first) this.nav(first);
   }
 
   prepMethod(m: Method): void {
     if (m === 'weigh-it-up') {
-      const opts = this.draft?.options ?? [];
-      this.weighRows =
-        opts.length >= 2
-          ? [...opts]
-          : opts.length === 1
-            ? [opts[0], 'Leave it as it is']
-            : ['Do it', 'Leave it as it is'];
       const w = this.draftWork;
       w.criteria ??= [];
       if (w.criteria.length === 0) w.criteria = ['', ''];
@@ -179,6 +186,7 @@ export class AppStore {
     this.prepMethod(m);
     const first = this.firstStep(m);
     this.geIndex = 0;
+    this.geCleared = false;
     if (first) this.nav(first);
     this.toast(`Switched to ${m === 'good-enough' ? 'Good enough' : m === 'weigh-it-up' ? 'Weigh it up' : 'Look ahead'}. What you wrote stays when the method can use it.`);
   }
@@ -193,6 +201,7 @@ export class AppStore {
       return;
     }
     this.geIndex = 0;
+    this.geCleared = false;
     this.nav('ge-check');
   }
   geCurrentOption(): string | null {
@@ -204,12 +213,15 @@ export class AppStore {
     const opts = this.draft?.options ?? [];
     if (opts.length === 0) {
       if (answer === 'yes') {
-        this.draft!.work.chosen = 'the act';
+        // No options: nothing to name. Track the outcome in session state only so
+        // nothing internal leaks into the persisted decision or the export.
+        this.geCleared = true;
         this.nav('ge-result');
       } else if (answer === 'notsure') {
         this.stopNow();
         this.toast('Kept open. A decision is not a deadline.');
       } else {
+        this.geCleared = false;
         this.nav('ge-result');
       }
       return;
@@ -217,6 +229,7 @@ export class AppStore {
     const cur = opts[this.geIndex];
     if (answer === 'yes') {
       this.draft!.work.chosen = cur;
+      this.geCleared = true;
       this.nav('ge-result');
     } else if (answer === 'notsure') {
       this.geIndex += 1;
@@ -237,8 +250,14 @@ export class AppStore {
     if (c.length < 5) c.push('');
   }
   removeCrit(i: number): void {
+    const hadScores = Object.keys(this.draftWork.scores ?? {}).length > 0;
     this.draftWork.criteria?.splice(i, 1);
+    // Removing a criterion shifts every column to the left, so the stored scores no
+    // longer line up. Clear them rather than silently mis-scoring, but say so.
     this.draftWork.scores = {};
+    if (hadScores) {
+      this.toast('Criterion removed. The fit marks were cleared so they are not misaligned.');
+    }
   }
   wpToWeights(): void {
     const c = (this.draftWork.criteria ?? []).map((x) => x.trim()).filter(Boolean);
@@ -294,7 +313,7 @@ export class AppStore {
     }
     d.status = 'decided';
     d.updated = new Date().toISOString();
-    d.statusHistory.push({ status: 'decided', at: d.updated });
+    this.recordStatus(d, 'decided', d.updated);
     await putDecision(d);
     const i = this.decisions.findIndex((x) => x.id === d.id);
     if (i >= 0) this.decisions[i] = d;
@@ -312,9 +331,16 @@ export class AppStore {
   async stopNow(): Promise<void> {
     const d = this.draft;
     if (d) {
+      if (this.isEmptyDraft(d)) {
+        // Nothing was written yet: leaving is abandoning, not saving. Do not keep a
+        // blank row that has no title and nothing to resume.
+        this.draft = null;
+        this.nav('home');
+        return;
+      }
       d.status = d?.stakes ? 'in-progress' : 'draft';
       d.updated = new Date().toISOString();
-      d.statusHistory.push({ status: d.status, at: d.updated });
+      this.recordStatus(d, d.status, d.updated);
       await putDecision(d);
       const i = this.decisions.findIndex((x) => x.id === d.id);
       if (i >= 0) this.decisions[i] = d;
@@ -323,6 +349,22 @@ export class AppStore {
     this.draft = null;
     this.nav('home');
     this.toast('Kept as a draft. Nothing you wrote is lost.');
+  }
+
+  /** Append a status event without repeating the last one, so history stays bounded. */
+  private recordStatus(d: Decision, status: Status, at: string): void {
+    const last = d.statusHistory[d.statusHistory.length - 1];
+    if (!last || last.status !== status) d.statusHistory.push({ status, at });
+  }
+
+  /** True when the draft holds nothing a person wrote: no question, options, or work. */
+  private isEmptyDraft(d: Decision): boolean {
+    const hasQuestion = !!d.question.trim();
+    const hasOptions = d.options.some((o) => o.trim() !== '');
+    const hasWork = Object.values(d.work ?? {}).some(
+      (v) => typeof v === 'string' ? v.trim() !== '' : Array.isArray(v) ? v.some((x) => typeof x === 'string' && x.trim() !== '') : v != null
+    );
+    return !hasQuestion && !hasOptions && !hasWork;
   }
 
   // ── view / export / delete ──────────────────────────────────

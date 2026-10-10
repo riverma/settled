@@ -199,7 +199,7 @@ pre.yaml{ background:var(--surface-sunk); border-radius:var(--radius-md); paddin
           </div>
           <div class="screen__scroll">
             <p class="ah-display-m" style="margin:8px 0 0;font-size:32px;">What do you need to decide?</p>
-            <p class="ah-caption" style="color:var(--text-secondary);">Sent as you write it. Nothing here is rewritten.</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">Write it plainly. The app works with your words, not against them.</p>
             <div class="ah-field ah-field--essence" style="margin-top:8px;">
               <input type="text" id="f-question" placeholder="Should I take the new job?" autocomplete="off">
             </div>
@@ -210,7 +210,7 @@ pre.yaml{ background:var(--surface-sunk); border-radius:var(--radius-md); paddin
                 <button class="ah-btn ah-btn--ghost ah-btn--sm" onclick="addOption()">Add an option</button>
                 <button class="ah-btn ah-btn--glass ah-btn--sm" id="btn-nothink" onclick="toggleNoOptions()">No options yet</button>
               </div>
-              <p class="ah-caption hidden" id="noopt-note" style="color:var(--text-secondary);margin-top:10px;">Understood. The comparison will be against leaving it as it is.</p>
+              <p class="ah-caption hidden" id="noopt-note" style="color:var(--text-secondary);margin-top:10px;">No options, just the question. That is enough to work with.</p>
             </div>
           </div>
           <div class="footer-actions">
@@ -225,7 +225,7 @@ pre.yaml{ background:var(--surface-sunk); border-radius:var(--radius-md); paddin
           </div>
           <div class="screen__scroll">
             <p class="ah-heading-l">How much does this one matter?</p>
-            <p class="ah-caption" style="color:var(--text-secondary);">One question. It decides which method is lightest and still honest.</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">One question. The answer picks how much structure this one needs.</p>
             <div class="ah-stack" style="margin-top:10px;gap:10px;">
               <button class="stake" data-stakes="a-little" onclick="setStakes(this)">
                 <span class="stake__w">A little</span>
@@ -252,7 +252,7 @@ pre.yaml{ background:var(--surface-sunk); border-radius:var(--radius-md); paddin
           <div class="screen__scroll">
             <div class="stepmark"><span class="ah-caps" id="ge-bar-n">Step 1 of 2</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:50%"></span></span></div>
             <p class="ah-heading-l">What would good enough look like?</p>
-            <p class="ah-caption" style="color:var(--text-secondary);">Not the perfect result. A result you would be glad to accept.</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">Name the smallest bar this decision would be glad to clear. When something clears it, you can stop looking and go.</p>
             <div class="ah-field ah-field--essence" style="margin-top:8px;"><textarea id="ge-bar-val" placeholder="Close, cheap, open now" style="min-height:70px;"></textarea></div>
             <p class="ah-caption" style="color:var(--text-secondary);">Why this works: <button class="mk-link" onclick="openInfo('good-enough')">satisficing</button>.</p>
           </div>
@@ -365,7 +365,7 @@ pre.yaml{ background:var(--surface-sunk); border-radius:var(--radius-md); paddin
           <div class="screen__scroll">
             <div class="stepmark"><span class="ah-caps" id="la-n">Step 1 of 5</span><span class="stepmark__bar"><span class="stepmark__fill" style="width:20%"></span></span></div>
             <p class="ah-heading-l">In ten minutes</p>
-            <p class="ah-caption" style="color:var(--text-secondary);">How will you feel about each side, ten minutes after you choose?</p>
+            <p class="ah-caption" style="color:var(--text-secondary);">How will you feel about each way it could go, ten minutes after you choose?</p>
             <div class="ah-field ah-field--essence" style="margin-top:8px;"><textarea id="la-a-val" placeholder="Probably relieved. A bit scared."></textarea></div>
             <p class="ah-caption" style="color:var(--text-secondary);">Nothing here is required. Say as much or as little as there is.</p>
           </div>
@@ -781,7 +781,7 @@ function geRenderCheck(){
   var note = document.getElementById('ge-check-q');
   var cur = document.getElementById('ge-check-cur');
   if (opts.length === 0){
-    note.textContent = 'No options, so the bar is the test. Does the plain act clear it?';
+    note.textContent = 'No options, so the bar is the only test. Does what you might do clear it?';
     cur.innerHTML = '<p style="font-family:var(--font-display);font-size:18px;color:var(--text-heading);margin:0;">' + esc(state.draft.question) + '</p>' +
       '<p class="ah-caption" style="color:var(--text-secondary);margin:8px 0 0;">Your bar: ' + esc(state.draft.work.bar) + '</p>';
   } else {
