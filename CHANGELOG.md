@@ -5,6 +5,20 @@ and versions follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-10
+
+### Fixed
+
+- **New decision opens outside a secure context.** The decision id no longer depends on
+  `crypto.randomUUID`, which is absent over plain HTTP (a LAN preview, for instance) and in
+  older browsers; the app now falls back to `crypto.getRandomValues`, then to a time-based
+  id, so the New decision button always opens the question screen.
+
+### Removed
+
+- The "Take the new job?" example chip on the empty Home screen. Home now simply invites
+  the first decision, and the spec and mockup were updated to match.
+
 ## [0.1.0] - 2026-10-09
 
 ### Added
@@ -25,4 +39,5 @@ and versions follow [Semantic Versioning](https://semver.org).
 - **A pocket PWA.** Installs, runs offline on a warm Day theme or a calm Night theme, and
   works with no network at all once loaded.
 
+[0.1.1]: https://github.com/riverma/settled/releases/tag/v0.1.1
 [0.1.0]: https://github.com/riverma/settled/releases/tag/v0.1.0

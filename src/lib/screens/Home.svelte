@@ -36,8 +36,6 @@
         <p class="ah-body" style="color: var(--text-secondary); max-width: 30em;">
           A decision, any size. You write it, Settled picks the lightest proven method to go with it.
         </p>
-        <button class="ah-pill ah-pill--outline" style="padding: 10px 18px; font-size: 11px; margin-top: 8px;"
-          onclick={() => app.startNew('Should I take the new job?')}>Take the new job?</button>
       </div>
     {/if}
   </div>

@@ -40,10 +40,28 @@ export interface Decision {
   statusHistory: StatusEvent[];
 }
 
+/**
+ * A random id that does not assume a secure context. `crypto.randomUUID` is undefined over
+ * plain HTTP (a LAN preview, for instance) and in older browsers, and a throwing New
+ * decision is a dead button, so fall back to `getRandomValues`, then to time plus randomness.
+ */
+export function newId(): string {
+  const c = globalThis.crypto;
+  if (typeof c?.randomUUID === 'function') return c.randomUUID();
+  if (typeof c?.getRandomValues === 'function') {
+    const b = c.getRandomValues(new Uint8Array(16));
+    b[6] = (b[6] & 0x0f) | 0x40; // version 4
+    b[8] = (b[8] & 0x3f) | 0x80; // variant 10
+    const hex = Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+  return `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 export function newDecision(question: string): Decision {
   const now = new Date().toISOString();
   return {
-    id: crypto.randomUUID(),
+    id: newId(),
     question: question.trim(),
     options: [],
     noOptions: false,

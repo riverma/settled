@@ -243,8 +243,8 @@ On save, the decision's status becomes **Decided** and the person returns to Hom
   decision.
 - **No count badges, no "N this week", no streaks, no scores.** Tapping a row resumes
   it; Decided rows reopen freely (§5.9).
-- **Empty state:** one warm line inviting the first decision and one example chip
-  ("Take the new job?"). No tour, no modal.
+- **Empty state:** one warm line inviting the first decision. No tour, no modal, no
+  example chip.
 
 ### 5.7 New decision
 
