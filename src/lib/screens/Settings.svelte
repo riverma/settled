@@ -21,6 +21,12 @@
     </div>
 
     <div class="ah-card ah-card--list">
+      <p class="ah-caps" style="margin-bottom: 12px;">Device</p>
+      <button class="ah-btn ah-btn--ghost ah-btn--sm" onclick={() => app.askInstall()}>Install this app</button>
+      <p class="ah-caption caption-sub" style="margin: 12px 0 0;">Add Settled to your home screen so it is one tap away, and it works even offline.</p>
+    </div>
+
+    <div class="ah-card ah-card--list">
       <p class="ah-caps" style="margin-bottom: 12px;">Data</p>
       <div class="ah-actions">
         <button class="ah-btn ah-btn--ghost ah-btn--sm" onclick={() => app.exportAll()}>Back up now</button>

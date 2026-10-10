@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import InstallBar from '$lib/ui/InstallBar.svelte';
   import { app } from '$lib/store.svelte';
   import Home from '$lib/screens/Home.svelte';
   import New from '$lib/screens/New.svelte';
@@ -18,6 +19,11 @@
   onMount(() => {
     const demo = new URLSearchParams(location.search).has('demo');
     void app.init(demo);
+    // the launcher's #install contract: "Install" on apps.riverma.com lands here
+    if (location.hash === '#install') {
+      history.replaceState(null, '', location.pathname + location.search);
+      app.installRequested = true;
+    }
   });
 
   $effect(() => {
@@ -47,5 +53,6 @@
     <SettingsScreen />
   {/if}
   <Sheets />
+  <InstallBar />
   <Toast />
 {/if}

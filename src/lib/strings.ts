@@ -8,6 +8,14 @@ export const STAKES: { key: Stakes; word: string; gloss: string }[] = [
 ];
 
 export const T = {
+  // install bar: the launcher's #install contract (see install bar component)
+  install: {
+    prompt: 'Install Settled to keep it one tap away.',
+    button: 'Install',
+    ios: 'On iPhone: open Share, then Add to Home Screen.',
+    generic: "Install Settled from your browser's menu to keep it one tap away.",
+    installed: 'Settled is installed.'
+  },
   homeLead: "What's on your mind?",
   newDecision: 'New decision',
   newTitle: 'What do you need to decide?',

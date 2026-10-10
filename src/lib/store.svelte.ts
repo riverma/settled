@@ -16,6 +16,8 @@ export type Screen =
 export type Sheet = null | 'ways' | 'info' | 'export' | 'confirm-delete' | 'erase-1' | 'erase-2' | 'about' | 'import' | 'restore';
 
 export class AppStore {
+  /** the launcher's #install contract: show the install bar on first paint */
+  installRequested = $state(false);
   ready = $state(false);
   theme = $state<'day' | 'night'>('day');
   decisions = $state<Decision[]>([]);
@@ -300,6 +302,11 @@ export class AppStore {
     this.draft = null;
     this.nav('home');
     this.toast('Saved. The decision is yours to reopen any time.');
+  }
+
+  /** the launcher's #install contract, reachable from Settings too */
+  askInstall() {
+    this.installRequested = true;
   }
 
   async stopNow(): Promise<void> {
